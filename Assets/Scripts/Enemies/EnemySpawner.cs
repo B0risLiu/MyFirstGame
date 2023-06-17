@@ -11,7 +11,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private List<ObjectPool> _enemyPools;
     [Header("WavesSettings")]
     [SerializeField] private Transform _spawnPointsRootObject;
-    [SerializeField] private List<EnemyNameAndAmount> _enemiesInWave;
+    [SerializeField] private List<EnemyAmountInWave> _enemiesInWave;
 
     private List<Enemy> _activeEnemies = new();
     private List<DamageableObject> _possibleTargets = new();
@@ -60,7 +60,7 @@ public class EnemySpawner : MonoBehaviour
 
     public void SetDelayBetweenWawes(float value)
     {
-        _delayBetweenWaves = new WaitForSeconds(value * 100);
+        _delayBetweenWaves = new WaitForSeconds((1 - value) * 100);
     }
 
     public void SaveSpawnerData(LoadingData loadingData)
@@ -125,7 +125,7 @@ public class EnemySpawner : MonoBehaviour
     {
         var pointsOfAppearingEnemy = new Queue<Transform>(spawnPoint.PointsOfAppearingEnemy);
 
-        foreach (EnemyNameAndAmount enemyInWave in _enemiesInWave)
+        foreach (EnemyAmountInWave enemyInWave in _enemiesInWave)
         {
             foreach (ObjectPool objectPool in _enemyPools)
             {

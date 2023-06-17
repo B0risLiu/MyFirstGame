@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class EnemyNameAndAmount
+public class EnemyAmountInWave
 {
     [SerializeField] private EnemyName _name;
     [SerializeField] private int _amount;

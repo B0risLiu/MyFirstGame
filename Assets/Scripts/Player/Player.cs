@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem.Interactions;
 
 public class Player : DamageableObject
 {
     [SerializeField] private int _deathCost;
     [SerializeField] private float _portalEffectUpOffsetMultipicator;
-    [SerializeField] private PlayerMover _mover;
     [SerializeField] private Transform _target;
     [SerializeField] private Transform _leftHendWeapon;
     [SerializeField] private Transform _rightHendWeapon;
@@ -20,12 +18,11 @@ public class Player : DamageableObject
 
     private List<Weapon> _installedWeapons = new List<Weapon>();
     private PlayerInput _input;
-    private bool _isFireAndMoveModesOn;
     private bool _isPermanentDeathOn;
 
     public int ResourcesAmount { get; private set; }
+    public bool IsFireAndMoveModesOn { get; protected set; }
     public float PortalEffectOffset => _portalEffectUpOffsetMultipicator;
-    public bool IsFireAndMoveModesOn => _isFireAndMoveModesOn;
 
     public event UnityAction<int> ResourcesAmountChanged;
     public event UnityAction<bool> FireAndMoveModesEnabled; 
@@ -37,42 +34,6 @@ public class Player : DamageableObject
         _input = new PlayerInput();
         _input.Player.Teleport.performed += ctx => OnTelepotrClick();
         _input.Player.SetLeandingPoint.performed += ctx => OnSetLandingPoint();
-        _input.Player.ShootShouldersWeapon.performed += ctx => OnShootShouldersWeapon();
-        _input.Player.ShootBackboneWeapon.performed += ctx => OnShootBackboneWeapon();
-        _input.Player.ShootLeftWeapon.performed += ctx =>
-        {
-            if (ctx.interaction is SlowTapInteraction)
-                OnShootLeftWeapon(false, false);
-            else if (ctx.interaction is TapInteraction)
-                OnShootLeftWeapon();
-        };
-        _input.Player.ShootRightWeapon.performed += ctx =>
-        {
-            if (ctx.interaction is SlowTapInteraction)
-                OnShootRightWeapon(false, false);
-            else if (ctx.interaction is TapInteraction)
-                OnShootRightWeapon();
-        };
-        _input.Player.ShootLeftWeapon.canceled += ctx =>
-        {
-            if (ctx.interaction is SlowTapInteraction)
-                OnShootLeftWeapon(false, false);
-        };
-        _input.Player.ShootRightWeapon.canceled += ctx =>
-        {
-            if (ctx.interaction is SlowTapInteraction)
-                OnShootRightWeapon(false, false);
-        };
-        _input.Player.ShootLeftWeapon.started += ctx =>
-        {
-            if (ctx.interaction is SlowTapInteraction)
-                OnShootLeftWeapon(false, true);
-        };
-        _input.Player.ShootRightWeapon.started += ctx =>
-        {
-            if (ctx.interaction is SlowTapInteraction)
-                OnShootRightWeapon(false, true);
-        };
     }
 
     private void OnEnable()
@@ -83,7 +44,7 @@ public class Player : DamageableObject
     private void Start()
     {
         ResourcesAmountChanged?.Invoke(ResourcesAmount);
-        FireAndMoveModesEnabled?.Invoke(_isFireAndMoveModesOn);
+        FireAndMoveModesEnabled?.Invoke(IsFireAndMoveModesOn);
         ResetHealth(Health);
     }
 
@@ -115,7 +76,7 @@ public class Player : DamageableObject
 
     public void SavePlayerData(LoadingData loadingData)
     {
-        loadingData.SavePlayerData(Health, ResourcesAmount, _isFireAndMoveModesOn, _isPermanentDeathOn, transform.position, transform.rotation, _installedWeapons);
+        loadingData.SavePlayerData(Health, ResourcesAmount, IsFireAndMoveModesOn, _isPermanentDeathOn, transform.position, transform.rotation, _installedWeapons);
     }
 
     public void ShowMessage(string text)
@@ -170,10 +131,7 @@ public class Player : DamageableObject
 
     public void FireAndMoveModesEnable(bool value)
     {
-        OnShootRightWeapon(false, false);
-        OnShootLeftWeapon(false, false);
-        _isFireAndMoveModesOn = value;
-        _mover.MoveModeEnable(value);
+        IsFireAndMoveModesOn = value;
         FireAndMoveModesEnabled?.Invoke(value);
     }
 
@@ -209,41 +167,9 @@ public class Player : DamageableObject
         return false;
     }
 
-    private void OnShootShouldersWeapon(bool isSingleShotModeOn = true, bool isSpecialFireModeOn = false)
-    {
-        Weapon weapon = GetWeapon(WeaponPleacement.Shoulders);
-
-        if (weapon != null && _isFireAndMoveModesOn)
-            weapon.Shoot(isSingleShotModeOn, isSpecialFireModeOn);
-    }
-
-    private void OnShootBackboneWeapon(bool isSingleShotModeOn = true, bool isSpecialFireModeOn = false)
-    {
-        Weapon weapon = GetWeapon(WeaponPleacement.Backbone);
-
-        if (weapon != null && _isFireAndMoveModesOn)
-            weapon.Shoot(isSingleShotModeOn, isSpecialFireModeOn);
-    }
-
-    private void OnShootLeftWeapon(bool isSingleShotModeOn = true, bool isSpecialFireModeOn = false)
-    {
-        Weapon weapon = GetWeapon(WeaponPleacement.LeftHend);
-
-        if (weapon != null && _isFireAndMoveModesOn)
-            weapon.Shoot(isSingleShotModeOn, isSpecialFireModeOn);
-    }
-
-    private void OnShootRightWeapon(bool isSingleShotModeOn = true, bool isSpecialFireModeOn = false)
-    {
-        Weapon weapon = GetWeapon(WeaponPleacement.RightHend);
-
-        if (weapon != null && _isFireAndMoveModesOn)
-            weapon.Shoot(isSingleShotModeOn, isSpecialFireModeOn);
-    }
-
     private void OnTelepotrClick()
     {
-        FireAndMoveModesEnable(!_isFireAndMoveModesOn);
+        FireAndMoveModesEnable(!IsFireAndMoveModesOn);
     }
 
     private void OnSetLandingPoint()

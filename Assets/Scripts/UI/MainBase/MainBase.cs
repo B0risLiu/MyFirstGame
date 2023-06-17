@@ -15,6 +15,7 @@ public class MainBase : MonoBehaviour
     [SerializeField] private DropContainer _mainBaseWeaponContainer;
     [SerializeField] private DropContainer _leftHandContainer;
     [SerializeField] private DropContainer _rightHandContainer;
+    [SerializeField] private DropContainer _backboneContainer;
     [SerializeField] private Transform _buildingsContainer;
     [SerializeField] private ResourceCollector _collectorTemplate;
 
@@ -42,13 +43,17 @@ public class MainBase : MonoBehaviour
             AddWeapon(weaponCard, _mainBaseWeaponContainer, WeaponPleacement.Base);
     }
 
-    public void LoadMainBaseData(bool isMainBasePanelActive, WeaponCard rightHand, WeaponCard leftHand, List<WeaponCard> weaponStorage, Dictionary<Vector3, int> activeResourceCollectorsPositionsWithHealth)
+    public void LoadMainBaseData(bool isMainBasePanelActive, WeaponCard rightHand, WeaponCard leftHand, 
+        WeaponCard backbone, List<WeaponCard> weaponStorage, Dictionary<Vector3, int> activeResourceCollectorsPositionsWithHealth)
     {
         if (leftHand != null)
             AddWeapon(leftHand, _leftHandContainer, WeaponPleacement.LeftHend);
 
         if (rightHand != null)
             AddWeapon(rightHand, _rightHandContainer, WeaponPleacement.RightHend);
+
+        if (backbone != null)
+            AddWeapon(backbone, _backboneContainer, WeaponPleacement.Backbone);
 
         foreach (WeaponCard weapon in weaponStorage)
             AddWeapon(weapon, _mainBaseWeaponContainer, WeaponPleacement.Base);
@@ -68,9 +73,10 @@ public class MainBase : MonoBehaviour
     {
         WeaponCard lefthand = _leftHandContainer.GetContainerData<WeaponView>().FirstOrDefault()?.WeaponCardInfo;
         WeaponCard rightHand = _rightHandContainer.GetContainerData<WeaponView>().FirstOrDefault()?.WeaponCardInfo;
+        WeaponCard backbone = _backboneContainer.GetContainerData<WeaponView>().FirstOrDefault()?.WeaponCardInfo;
         List<WeaponCard> weaponStorage = _mainBaseWeaponContainer.GetContainerData<WeaponView>().Select(viev => viev.WeaponCardInfo).ToList();
         Dictionary<Vector3, int> activeResourceDeposits = GetActiveResourceCollectorsPositionsWithHealth();
-        loadingData.SaveMainBaseData(_mainBasePanel.activeSelf, rightHand, lefthand, weaponStorage, activeResourceDeposits);
+        loadingData.SaveMainBaseData(_mainBasePanel.activeSelf, rightHand, lefthand, backbone, weaponStorage, activeResourceDeposits);
     }
 
     public bool TryInstallWeapon(WeaponLable weapon, WeaponPleacement newPleacement, WeaponPleacement parentPlacemrnt, int price)

@@ -57,11 +57,11 @@ public class LoadingData
         _planetLoadingData.CameraDataStorage = new CameraData(position, rotation, isCameraFollowingModeOn);
     }
 
-    public void SaveMainBaseData(bool isMainBasePanelActive, WeaponCard rightHand, WeaponCard leftHand, 
+    public void SaveMainBaseData(bool isMainBasePanelActive, WeaponCard rightHand, WeaponCard leftHand, WeaponCard backbone, 
         List<WeaponCard> weaponStorage, Dictionary<Vector3, int> activeResourceCollectorsPositionsWithHealth)
     {
         CheckPlanetLoadingData();
-        _planetLoadingData.MainBaseDataStorage = new MainBaseData(isMainBasePanelActive, rightHand, leftHand, 
+        _planetLoadingData.MainBaseDataStorage = new MainBaseData(isMainBasePanelActive, rightHand, leftHand, backbone, 
             weaponStorage, activeResourceCollectorsPositionsWithHealth);
     }
 
@@ -101,7 +101,7 @@ public class LoadingData
     {
         if (_planetLoadingData != null)
             mainBase.LoadMainBaseData(_planetLoadingData.MainBaseDataStorage.IsMainBasePanelActive, _planetLoadingData.MainBaseDataStorage.RightHand, 
-                _planetLoadingData.MainBaseDataStorage.LeftHand, _planetLoadingData.MainBaseDataStorage.WeaponStorage, 
+                _planetLoadingData.MainBaseDataStorage.LeftHand, _planetLoadingData.MainBaseDataStorage.Backbone, _planetLoadingData.MainBaseDataStorage.WeaponStorage, 
                 _planetLoadingData.MainBaseDataStorage.ActiveResourceCollectorsPositionsWithHealth);
         else
             mainBase.LoadMainBaseDefaultData();

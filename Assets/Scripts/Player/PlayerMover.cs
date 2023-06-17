@@ -4,14 +4,14 @@ using UnityEngine.Animations.Rigging;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Player))]
 [RequireComponent(typeof(AudioSource))]
 
 public class PlayerMover : MonoBehaviour
 {
+    [SerializeField] private Player _player;
+    [SerializeField] private Rig _rig;
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _chassisRotationSpeed;
-    [SerializeField] private Rig _rig;
     [SerializeField] private List<AudioClip> _footsteps;
 
     private const string IsWalking = "IsWalking";
@@ -21,7 +21,6 @@ public class PlayerMover : MonoBehaviour
     private Animator _animator;
     private AudioSource _audioSource;
     private PlayerInput _input;
-    private bool _isPlayerCanMove;
 
     private void Awake()
     {
@@ -34,11 +33,12 @@ public class PlayerMover : MonoBehaviour
     private void OnEnable()
     {
         _input.Enable();
+        _player.FireAndMoveModesEnabled += OnFireAndMoveEnabled;
     }
 
     private void Update()
     {
-        if (_isPlayerCanMove)
+        if (_player.IsFireAndMoveModesOn)
         {
             Vector2 input = _input.Player.Move.ReadValue<Vector2>();
             Vector3 direction = new Vector3(input.x, 0, input.y);
@@ -51,15 +51,7 @@ public class PlayerMover : MonoBehaviour
     private void OnDisable()
     {
         _input.Disable();
-    }
-
-    public void MoveModeEnable(bool value)
-    {
-        _isPlayerCanMove = value;
-        _rig.weight = _isPlayerCanMove ? 1 : 0;
-
-        if (_isPlayerCanMove == false && _animator != null)
-            Move(Vector3.zero, 0);
+        _player.FireAndMoveModesEnabled -= OnFireAndMoveEnabled;
     }
 
     public void Footstep()
@@ -97,5 +89,13 @@ public class PlayerMover : MonoBehaviour
             Vector3 newDirection = Vector3.RotateTowards(transform.forward, direction, _chassisRotationSpeed * Time.deltaTime, 0);
             transform.rotation = Quaternion.LookRotation(newDirection);
         }
+    }
+
+    private void OnFireAndMoveEnabled(bool value)
+    {
+        _rig.weight = value == true ? 1 : 0;
+
+        if (value == false && _animator != null)
+            Move(Vector3.zero, 0);
     }
 }

@@ -1,7 +1,7 @@
  using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class TorsoRotatior : MonoBehaviour
+public class PlayerTorsoRotatior : MonoBehaviour
 {
     [SerializeField] private LayerMask _hitLayerMask;
     [SerializeField] private Transform _target;
